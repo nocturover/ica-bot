@@ -1,4 +1,4 @@
-from utils.initailize import check_balance, check_db, check_env_file, check_holdings, check_kis_token
+from utils.initailize import check_db, check_env_file, check_holdings, check_kis_token, check_settings
 from rich.console import Console
 from rich.table import Table
 console = Console()
@@ -72,5 +72,12 @@ if not print_check_result(
 ):
     exit()
 
+# Step5 : 무한매수법 세팅값 확인 및 시작 
+print_step_table(5, "무한매수법 세팅값 확인", "무한매수법 세팅값을 확인합니다.")
+if not print_check_result(
+    "무한매수법 세팅값 확인",
+    "무한매수법 세팅값이 정상적으로 확인되었습니다.",
+    "무한매수법 세팅값 확인 실패했습니다.",
+    check_settings
+):
     exit()
-

@@ -226,3 +226,73 @@ def check_overseas_holdings():
     """해외주식 보유종목 체크 함수 - True/False만 반환"""
     result = get_overseas_holdings()
     return result is not None
+
+class OverseasHoldings:
+    """
+    해외주식 체결기준현재잔고 조회용 클래스 (인스턴스 방식)
+    사용 예시:
+        holdings = OverseasHoldings(appkey, appsecret, access_token, account)
+        data = holdings.get_holdings()
+        holdings.print_outputs(data)
+    """
+    API_URL = "https://openapi.koreainvestment.com:9443/uapi/overseas-stock/v1/trading/inquire-present-balance"
+    TR_ID = "CTRP6504R"  # 실전투자 TR ID
+
+    def __init__(self, appkey, appsecret, access_token, account):
+        self.appkey = appkey
+        self.appsecret = appsecret
+        self.access_token = access_token
+        self.account = account
+        self.console = console
+
+    def _split_account(self):
+        if len(self.account) != 11:
+            raise ValueError("계좌번호 형식이 올바르지 않습니다. (하이픈 포함 11자리)")
+        cano = self.account[:8]
+        acnt_prdt_cd = self.account[-2:]
+        return cano, acnt_prdt_cd
+
+    def _make_headers(self):
+        return {
+            "Content-Type": "application/json; charset=utf-8",
+            "authorization": f"Bearer {self.access_token}",
+            "appkey": self.appkey,
+            "appsecret": self.appsecret,
+            "tr_id": self.TR_ID
+        }
+
+    def _make_params(self, cano, acnt_prdt_cd):
+        return {
+            "CANO": cano,
+            "ACNT_PRDT_CD": acnt_prdt_cd,
+            "WCRC_FRCR_DVSN_CD": "02",
+            "NATN_CD": "000",
+            "TR_MKET_CD": "00",
+            "INQR_DVSN_CD": "00"
+        }
+
+    def get_holdings(self):
+        """해외주식 보유종목 조회 (성공시 dict 반환, 실패시 None)"""
+        """외화예수금: frcr_dncl_amt_2
+        출금가능금액: frcr_drwg_psbl_amt_1
+        평가금액: frcr_evlu_amt2
+        최초환율: frst_bltn_exrt
+        """
+        try:
+            cano, acnt_prdt_cd = self._split_account()
+            headers = self._make_headers()
+            params = self._make_params(cano, acnt_prdt_cd)
+            log_print("[bold cyan]🌍 (클래스) 해외주식 체결기준현재잔고 조회 시도[/bold cyan]")
+            response = requests.get(self.API_URL, headers=headers, params=params)
+            if not response.ok:
+                return None
+            data = response.json()
+            if data.get("rt_cd") != "0":
+                return None
+            return data
+        except Exception:
+            return None
+
+    def print_outputs(self, data):
+        """조회 결과를 콘솔로 출력 (기존 print_all_outputs 재사용)"""
+        print_all_outputs(data)

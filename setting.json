@@ -1,0 +1,15 @@
+{
+  "strategy": "무한매수법 v3.0",
+  "initial_capital": 12000,
+  "ovrs_excg_cd": "AMEX",
+  "symbol": "SOXL",
+  "num_of_purchases": 40,
+  "sell_multiplier": 1.1,
+  "moc_trigger_rate": 0.95,
+  "profit_sell_ratio": 0.75,
+  "rsi_period": 14,
+  "rsi_entry_threshold": 100,
+  "reinvestment_type": "simple",
+  "compound_ratio": 25,
+  "enabled": true
+}
